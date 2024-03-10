@@ -33,7 +33,11 @@ list_versions() {
   if [ "${INPUT_TAG:-false}" = "true" ]; then
     git ls-remote -q --tags "https://github.com/${REPO}.git" | awk '{ print $2 }'
   else
-    list_releases |  jq -r '.[] | .tag_name'
+    if [ "${INPUT_ALLOW-PRERELEASE:-false}" = "true" ]; then
+      list_releases |  jq -r '.[] | .tag_name'
+    else
+      list_releases |  jq -r '.[] | select(.prerelease != true) | .tag_name'
+    fi
   fi
 }
 
@@ -49,8 +53,10 @@ set_output() {
 
 LATEST_VERSION="$(\
   list_versions | \
-  grep -oP '\d+(\.\d+)+(-[^'\''\"\s]*)?$'| \
+  grep -oP '\d+(\.\d+)+(-[^'\''\"\s]*)?$' | \
+  sed '/-/!{s/$/_/;}; s/-patch/_patch/' | \
   sort --version-sort --reverse | \
+  sed 's/_$//; s/_patch/-patch/' | \
   head -n1 \
   )"
 

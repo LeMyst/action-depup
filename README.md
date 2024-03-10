@@ -55,6 +55,10 @@ inputs:
     description: "Check tags instead of releases."
     default: "false"
     required: false
+  allow-prerelease:
+    description: 'Allow releases tagged as prerelease. Does not work with tags.'
+    default: 'false'
+    required: false
 ```
 
 ## Example usage

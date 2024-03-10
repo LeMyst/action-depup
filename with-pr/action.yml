@@ -18,6 +18,10 @@ inputs:
     description: 'Check tags instead of releases.'
     default: 'false'
     required: false
+  allow-prerelease:
+    description: 'Allow releases tagged as prerelease. Does not work with tags.'
+    default: 'false'
+    required: false
   tag_prefix:
     description: 'Tag prefix used for building link in PR description'
     default: 'v'
@@ -39,7 +43,7 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - uses: reviewdog/action-depup@v1
+    - uses: lemyst/action-depup@allow-prelease
       id: depup
       with:
         github_token: ${{ inputs.github_token }}
@@ -47,6 +51,7 @@ runs:
         version_name: ${{ inputs.version_name }}
         repo: ${{ inputs.repo }}
         tag: ${{ inputs.tag }}
+        allow-prerelease: ${{ inputs.allow-prerelease }}
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v6
       with:
